@@ -25,8 +25,8 @@ jobs:
           
       - name: Train Model
         run: |
-          jupyter nbconvert --to script train_model.ipynb
-          python train_model.py
+          jupyter nbconvert --to script model_train.ipynb
+          python model_train.py
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
