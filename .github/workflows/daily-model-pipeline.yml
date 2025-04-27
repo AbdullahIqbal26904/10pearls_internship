@@ -23,9 +23,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install jupyter nbconvert pandas numpy boto3 requests matplotlib seaborn scikit-learn==1.3.2 shap python-dotenv
           
-      - name: Update scikit-learn calls
+      - name: Update Jupyter notebooks
         run: |
-          # Fix mean_squared_error calls in the scripts
+          # First ensure numpy is imported in both files
+          sed -i '/import pandas as pd/a import numpy as np' model_train.ipynb
+          sed -i '/import pandas as pd/a import numpy as np' prediction.ipynb
+          
+          # Then fix mean_squared_error calls
           sed -i 's/mean_squared_error(y_test, y_pred, squared=False)/np.sqrt(mean_squared_error(y_test, y_pred))/g' model_train.ipynb
           sed -i 's/mean_squared_error(y_test, y_pred, squared=False)/np.sqrt(mean_squared_error(y_test, y_pred))/g' prediction.ipynb
           
