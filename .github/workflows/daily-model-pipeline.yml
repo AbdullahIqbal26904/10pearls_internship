@@ -1,4 +1,4 @@
-name: Hourly Data Pipeline
+name: Daily Model Train Pipeline
 
 on:
   schedule:
