@@ -7,6 +7,11 @@ import plotly.express as px
 from datetime import datetime, timedelta
 import pickle
 import os
+import boto3
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -61,21 +66,23 @@ st.markdown("""
 def load_data():
     """Load historical AQI data and predictions."""
     try:
-        # Load historical data
-        historical_data = pd.read_csv('./cleaned_aqi_weather_dataset.csv')
-        
-        # Load prediction results
-        if os.path.exists('./prediction_results.pkl'):
-            with open('./prediction_results.pkl', 'rb') as f:
-                predictions = pickle.load(f)
-        else:
-            # If prediction file doesn't exist, create sample predictions
-            today = datetime.now().date()
-            predictions = pd.DataFrame({
-                'Date': [(today + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(1, 4)],
-                'Predicted_AQI': [3.7, 3.8, 3.9],
-                'Predicted_Calculated_AQI': [230, 232, 235]
-            })
+        # --- Step 1: Load Data from AWS S3 ---
+        bucket_name = 'my-feature-store-data'
+        data_key = 'pipeline-data/data.csv'
+        prediction_key = 'predictions/prediction_results.csv'
+        # Create S3 client
+        s3 = boto3.client(
+            's3',
+            aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+        )
+
+        # Load dataset
+        obj = s3.get_object(Bucket=bucket_name, Key=data_key)
+        historical_data = pd.read_csv(obj['Body'])
+        # Load predictions
+        obj = s3.get_object(Bucket=bucket_name, Key=prediction_key)
+        predictions = pd.read_csv(obj['Body'])
         
         return historical_data, predictions
     except Exception as e:
