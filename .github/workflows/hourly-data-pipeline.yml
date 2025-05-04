@@ -27,21 +27,22 @@ jobs:
         run: |
           jupyter nbconvert --to script feature_extract_from_api_hourly.ipynb
           python feature_extract_from_api_hourly.py
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           
       - name: Run data extraction
         run: |
           jupyter nbconvert --to script extract_data.ipynb
           python extract_data.py
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           
       - name: Run EDA and cleaning
         run: |
           jupyter nbconvert --to script EDA.ipynb
           python EDA.py
-          
-      - name: Upload to AWS
-        run: |
-          jupyter nbconvert --to script feature_upload_aws.ipynb
-          python feature_upload_aws.py
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
